@@ -1,10 +1,19 @@
-# Etapa 1: Imagem base com o JDK
+FROM maven:3.8.5-openjdk-17  AS builder
+
+WORKDIR /appCOPY pom.xml .
+
+RUN mvn dependency:go-offline
+
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
 FROM eclipse-temurin:17-jdk-alpine
-# Define o diretório de trabalho
+
 WORKDIR /app
-# Copia o JAR já gerado para dentro do contêiner
-COPY target/*.jar app.jar
-# Expondo a porta 8080, padrão do Spring Boot
+
+COPY --from=builder /app/target/*.jar app.jar
+
 EXPOSE 8080
-# Comando para rodar a aplicação
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
