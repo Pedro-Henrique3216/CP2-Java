@@ -37,11 +37,11 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Invalid input provided")
     })
     @PostMapping
-    public ResponseEntity<String> addBook(@Valid @RequestBody BookRequest request, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<BookResponse> addBook(@Valid @RequestBody BookRequest request, UriComponentsBuilder uriBuilder) {
         Book book = request.toBook();
         URI uri = uriBuilder.path("/{id}").buildAndExpand(book.getId()).toUri();
         Book savedBook = this.bookService.save(book);
-        return ResponseEntity.created(uri).body(savedBook.toString());
+        return ResponseEntity.created(uri).body(BookResponse.toResponse(savedBook));
     }
 
     @Operation(summary = "Get all books", description = "Returns a list of all books")
