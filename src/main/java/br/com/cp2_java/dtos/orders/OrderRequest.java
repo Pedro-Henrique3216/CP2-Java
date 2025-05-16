@@ -9,13 +9,11 @@ import java.util.Set;
 
 public record OrderRequest(
         Set<OrderItemsRequest> orderItems,
-        LocalDate orderDate,
-        BigDecimal total
+        LocalDate orderDate
 ) {
     public Order toOrder() {
         Order order = new Order();
         order.setOrderDate(this.orderDate != null ? this.orderDate : LocalDate.now());
-        order.setTotal(this.total);
         for (OrderItemsRequest itemRequest : orderItems) {
             OrderItems orderItem = itemRequest.toOrderItem();
             order.getOrderItems().add(orderItem);

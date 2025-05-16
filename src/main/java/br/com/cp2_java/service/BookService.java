@@ -39,6 +39,7 @@ public class BookService {
     public Book addBook(UUID id, int quantity) throws BookNotFound {
         Book book = this.bookRepository.findById(id).orElseThrow(() -> new BookNotFound("Book not found"));
         book.addBook(quantity);
+        System.out.println(book.getQuantity());
         return this.bookRepository.save(book);
     }
 

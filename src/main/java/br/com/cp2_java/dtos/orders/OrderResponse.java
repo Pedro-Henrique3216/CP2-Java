@@ -14,7 +14,7 @@ public record OrderResponse(
         BigDecimal total,
         Set<OrderItemResponse> orderItems
 ) {
-    public static OrderResponse fromOrder(Order order) {
+    public static OrderResponse fromResponse(Order order) {
         Set<OrderItemResponse> itemResponses = order.getOrderItems().stream()
                 .map(OrderItemResponse::fromOrderItem)
                 .collect(Collectors.toSet());

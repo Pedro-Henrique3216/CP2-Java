@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -46,9 +47,9 @@ public class BookController {
 
     @Operation(summary = "Get all books", description = "Returns a list of all books")
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
+    public ResponseEntity<List<BookResponse>> getAllBooks() {
         List<Book> books = this.bookService.findAll();
-        return ResponseEntity.ok(books);
+        return ResponseEntity.ok(books.stream().map(BookResponse::toResponse).toList());
     }
 
     @Operation(summary = "Get all books in pages", description = "Returns a paginated list of books")
@@ -56,11 +57,10 @@ public class BookController {
             @ApiResponse(responseCode = "200", description = "Books retrieved successfully"),
     })
     @GetMapping("/page")
-    public ResponseEntity<Page<BookResponse>> getAllBooksInPages(Pageable pageable) {
+    public ResponseEntity<Page<BookResponse>> getAllBooksInPages(@PageableDefault Pageable pageable) {
         Page<BookResponse> bookResponses = this.bookService
                 .findAll(pageable)
                 .map(BookResponse::toResponse);
-
         return ResponseEntity.ok(bookResponses);
     }
 
@@ -75,7 +75,7 @@ public class BookController {
         return ResponseEntity.ok(BookResponse.toResponse(book));
     }
 
-    @Operation(summary = "Update the quantity of a book", description = "Updates the quantity of the specified book")
+    @Operation(summary = "add the quantity of a book", description = "Updates the quantity of the specified book")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Book quantity updated successfully"),
             @ApiResponse(responseCode = "404", description = "Book not found")

@@ -37,11 +37,11 @@ public class OrderController {
             @ApiResponse(responseCode = "400", description = "Invalid input or insufficient stock")
     })
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody @Valid OrderRequest request) throws BookNotFound, InsufficientStock {
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid OrderRequest request) throws BookNotFound, InsufficientStock {
         Order order = orderBookService.save(request.toOrder());
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(order.getId()).toUri();
-        return ResponseEntity.created(uri).body(order);
+        return ResponseEntity.created(uri).body(OrderResponse.fromResponse(order));
     }
 
     @Operation(summary = "Update an existing order", description = "Updates the items in an existing order")
@@ -53,7 +53,7 @@ public class OrderController {
     @PutMapping("/{id}")
     public ResponseEntity<OrderResponse> updateOrder(@PathVariable("id") UUID id, @RequestBody @Valid UpdatedOrderRequest request) throws BookNotFound, InsufficientStock, ItemNotFound, OrderNotFound {
         Order order = this.orderBookService.updateOrder(id, request.items());
-        return ResponseEntity.ok(OrderResponse.fromOrder(order));
+        return ResponseEntity.ok(OrderResponse.fromResponse(order));
     }
 
     @Operation(summary = "Get all orders", description = "Returns a list of all orders")
@@ -61,9 +61,9 @@ public class OrderController {
             @ApiResponse(responseCode = "200", description = "Orders retrieved successfully")
     })
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
         List<Order> orders = orderBookService.findAll();
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(orders.stream().map(OrderResponse::fromResponse).toList());
     }
 
     @Operation(summary = "Get order by ID", description = "Returns the order details for a given order ID")
@@ -72,9 +72,9 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Order not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable("id") UUID id) throws OrderNotFound {
+    public ResponseEntity<OrderResponse> getOrderById(@PathVariable("id") UUID id) throws OrderNotFound {
         Order order = orderBookService.findById(id);
-        return ResponseEntity.ok(order);
+        return ResponseEntity.ok(OrderResponse.fromResponse(order));
     }
 
     @Operation(summary = "Delete an order", description = "Deletes an order based on the provided order ID")
@@ -84,6 +84,6 @@ public class OrderController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable("id") UUID id) {
         orderBookService.delete(id);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 }

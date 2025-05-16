@@ -29,7 +29,7 @@ public class Order {
     @Column(nullable = false)
     private LocalDate orderDate = LocalDate.now();
     @Column(nullable = false)
-    private BigDecimal total;
+    private BigDecimal total = BigDecimal.ZERO;
 
     @Override
     public boolean equals(Object o) {
